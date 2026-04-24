@@ -4,8 +4,8 @@ import logging
 from telebot import TeleBot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
-BOT_TOKEN = "8711059649:AAF7ysdDRw3rbWo9INoHvekeSCwy49QYhWE"
-MINI_APP_URL = "https://curious-kitsune-70d212.netlify.app"
+BOT_TOKEN = "8609032177:AAHWc7s7iMBu0LPpJboovAG18g6l0yYdg8I"
+MINI_APP_URL = "https://frolicking-arithmetic-a1914b.netlify.app"
 
 bot = TeleBot(BOT_TOKEN)
 logging.basicConfig(level=logging.INFO)

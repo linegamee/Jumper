@@ -1,12 +1,11 @@
 import os
 import json
 import logging
-import sys
 from telebot import TeleBot
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-BOT_TOKEN = "8711059649:AAF7ysdDRw3rbWo9INoHvekeSCwy49QYhWE"
-MINI_APP_URL = "https://curious-kitsune-70d212.netlify.app"
+BOT_TOKEN = "8609032177:AAHWc7s7iMBu0LPpJboovAG18g6l0yYdg8I"
+MINI_APP_URL = "https://frolicking-arithmetic-a1914b.netlify.app"
 
 bot = TeleBot(BOT_TOKEN)
 logging.basicConfig(level=logging.INFO)
@@ -34,13 +33,26 @@ IMAGE_FILE_ID = config.get('image_file_id', '')
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    keyboard = InlineKeyboardMarkup()
-    web_app = WebAppInfo(url=MINI_APP_URL)
-    button = InlineKeyboardButton(
-        text="🚀 СТАРТ",
-        web_app=web_app
+    # Создаем клавиатуру с кнопкой "НАЧАТЬ"
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    
+    # Кнопка для открытия игры
+    game_button = InlineKeyboardButton(
+        text="🎮 НАЧАТЬ АНАЛИЗ",
+        url=MINI_APP_URL  # Открывается в браузере Telegram
     )
-    keyboard.add(button)
+    keyboard.add(game_button)
+    
+    # Приветственный текст
+    welcome_text = (
+        f"👋 Привет, {message.from_user.first_name}!\n\n"
+        "🎮 Добро пожаловать в **JAMPER SIGNAL**!\n\n"
+        "🔥 Здесь тебя ждут:\n"
+        "• Анализы игры\n"
+        "• Крутые эмоции\n"
+        "• Много веселья\n\n"
+        "👇 Нажми на кнопку ниже, чтобы начать!"
+    )
     
     # Проверяем, есть ли сохраненное фото
     if IMAGE_FILE_ID:
@@ -48,21 +60,24 @@ def send_welcome(message):
             bot.send_photo(
                 message.chat.id,
                 photo=IMAGE_FILE_ID,
-                caption="Привет! Нажмите на кнопку ниже, чтобы открыть JAMPER SIGNAL:",
-                reply_markup=keyboard
+                caption=welcome_text,
+                reply_markup=keyboard,
+                parse_mode="Markdown"
             )
         except Exception as e:
             logging.error(f"Ошибка отправки фото: {e}")
             bot.send_message(
                 message.chat.id,
-                "Привет! Нажми на кнопку ниже, чтобы открыть JAMPER SIGNAL:",
-                reply_markup=keyboard
+                welcome_text,
+                reply_markup=keyboard,
+                parse_mode="Markdown"
             )
     else:
         bot.send_message(
             message.chat.id,
-            "Привет! Нажми на кнопку ниже, чтобы открыть JAMPER SIGNAL:",
-            reply_markup=keyboard
+            welcome_text,
+            reply_markup=keyboard,
+            parse_mode="Markdown"
         )
 
 # Команда для админа - показать текущий FILE_ID
@@ -73,10 +88,10 @@ def get_current_file_id(message):
         return
     
     if IMAGE_FILE_ID:
-        # Убираем Markdown форматирование, отправляем обычным текстом
         bot.reply_to(
             message,
-            f"📸 Текущий FILE_ID фото:\n\n{IMAGE_FILE_ID}\n\n💡 Чтобы обновить фото, отправь новое фото в этот чат"
+            f"📸 Текущий FILE_ID фото:\n\n`{IMAGE_FILE_ID}`\n\n💡 Чтобы обновить фото, отправь новое фото в этот чат",
+            parse_mode="Markdown"
         )
     else:
         bot.reply_to(
@@ -100,17 +115,18 @@ def handle_photo(message):
     config['image_file_id'] = new_file_id
     save_config(config)
     
-    # Отправляем подтверждение (без Markdown)
+    # Отправляем подтверждение
     keyboard = InlineKeyboardMarkup()
     test_button = InlineKeyboardButton(
-        text="🔍 ТЕСТИРОВАТЬ",
+        text="🔍 ПРОВЕРИТЬ (/start)",
         callback_data="test_welcome"
     )
     keyboard.add(test_button)
     
     bot.reply_to(
         message,
-        f"✅ Новое фото сохранено!\n\n📸 FILE_ID:\n{new_file_id}\n\n👉 Используй /start для теста\n👉 Используй /getfileid чтобы посмотреть текущий ID",
+        f"✅ Новое фото сохранено!\n\n📸 FILE_ID:\n`{new_file_id}`\n\n👉 Используй /start для проверки\n👉 Используй /getfileid чтобы посмотреть текущий ID",
+        parse_mode="Markdown",
         reply_markup=keyboard
     )
     
@@ -123,30 +139,54 @@ def test_welcome(call):
         bot.answer_callback_query(call.id, "❌ Access denied")
         return
     
-    # Отправляем тестовое сообщение с новым фото
-    keyboard = InlineKeyboardMarkup()
-    web_app = WebAppInfo(url=MINI_APP_URL)
-    button = InlineKeyboardButton(
-        text="🚀 СТАРТ",
-        web_app=web_app
+    # Отправляем тестовое сообщение как приветствие
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    game_button = InlineKeyboardButton(
+        text="🎮 НАЧАТЬ ИГРУ",
+        url=MINI_APP_URL
     )
-    keyboard.add(button)
+    keyboard.add(game_button)
+    
+    welcome_text = (
+        "✅ *ТЕСТОВОЕ ПРИВЕТСТВИЕ*\n\n"
+        "👋 Привет! Добро пожаловать в **JAMPER SIGNAL**!\n\n"
+        "👇 Нажми на кнопку ниже, чтобы начать игру!"
+    )
     
     if IMAGE_FILE_ID:
         bot.send_photo(
             call.message.chat.id,
             photo=IMAGE_FILE_ID,
-            caption="✅ ТЕСТОВОЕ СООБЩЕНИЕ\nПривет! Нажми на кнопку ниже:",
-            reply_markup=keyboard
+            caption=welcome_text,
+            reply_markup=keyboard,
+            parse_mode="Markdown"
         )
     else:
         bot.send_message(
             call.message.chat.id,
-            "❌ Фото не установлено. Отправь фото для установки.",
-            reply_markup=keyboard
+            welcome_text,
+            reply_markup=keyboard,
+            parse_mode="Markdown"
         )
     
     bot.answer_callback_query(call.id, "✅ Тестовое сообщение отправлено!")
+
+# Команда для сброса фото (только админ)
+@bot.message_handler(commands=['resetphoto'])
+def reset_photo(message):
+    if message.from_user.id != ADMIN_ID:
+        bot.reply_to(message, "❌ Access denied.")
+        return
+    
+    global IMAGE_FILE_ID
+    IMAGE_FILE_ID = ''
+    config['image_file_id'] = ''
+    save_config(config)
+    
+    bot.reply_to(
+        message,
+        "✅ Фото приветствия сброшено!\nТеперь будет отправляться только текст."
+    )
 
 # Блокировка остальных медиа для не-админов
 @bot.message_handler(content_types=['video', 'document', 'audio', 'voice', 'animation'])
@@ -154,10 +194,37 @@ def block_media(message):
     if message.from_user.id != ADMIN_ID: 
         bot.reply_to(message, "❌ Access denied.")
 
-print("✅ Бот запущен!")
-print("🤖 Команды для админа:")
+# Информация о боте
+@bot.message_handler(commands=['help'])
+def help_command(message):
+    help_text = (
+        "🤖 *JAMPER SIGNAL BOT*\n\n"
+        "📌 *Доступные команды:*\n"
+        "/start - Запустить бота\n"
+        "/help - Показать это сообщение\n\n"
+        "👑 *Команды администратора:*\n"
+        "/getfileid - Показать текущий FILE_ID фото\n"
+        "/resetphoto - Сбросить приветственное фото\n\n"
+        "📤 *Как установить фото:*\n"
+        "1. Отправь фото боту\n"
+        "2. Фото автоматически сохранится\n"
+        "3. Используй /start для проверки"
+    )
+    bot.reply_to(message, help_text, parse_mode="Markdown")
+
+print("=" * 50)
+print("✅ Бот JAMPER SIGNAL успешно запущен!")
+print("=" * 50)
+print(f"🤖 Имя бота: @{bot.get_me().username}")
+print(f"👑 Админ ID: {ADMIN_ID}")
+print(f"🌐 Mini App URL: {MINI_APP_URL}")
+print(f"📸 Фото установлено: {'Да' if IMAGE_FILE_ID else 'Нет'}")
+print("=" * 50)
+print("📌 Команды для админа:")
 print("  📤 Отправь фото - обновить приветственное изображение")
 print("  /getfileid - показать текущий FILE_ID")
+print("  /resetphoto - сбросить фото")
 print("  /start - тест приветствия")
+print("=" * 50)
 
 bot.infinity_polling()

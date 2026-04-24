@@ -38,7 +38,7 @@ def send_welcome(message):
     
     # Кнопка для открытия мини-приложения (WebApp)
     game_button = InlineKeyboardButton(
-        text="🎮 НАЧАТЬ ИГРУ",
+        text="🎮 НАЧАТЬ АНАЛИЗ",
         web_app=WebAppInfo(url=MINI_APP_URL)  # Открывается как мини-приложение
     )
     keyboard.add(game_button)
@@ -48,8 +48,8 @@ def send_welcome(message):
         f"👋 Привет, {message.from_user.first_name}!\n\n"
         "🎮 Добро пожаловать в **JAMPER SIGNAL**!\n\n"
         "🔥 Здесь тебя ждут:\n"
-        "• Увлекательные игры\n"
-        "• Крутые бонусы\n"
+        "• Увлекательные анализы\n"
+        "• Крутые эмоции\n"
         "• Много веселья\n\n"
         "👇 Нажми на кнопку ниже, чтобы начать!"
     )

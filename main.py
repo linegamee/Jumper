@@ -1,11 +1,12 @@
 import os
 import json
 import logging
+import sys
 from telebot import TeleBot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
-BOT_TOKEN = "8609032177:AAHWc7s7iMBu0LPpJboovAG18g6l0yYdg8I"
-MINI_APP_URL = "https://frolicking-arithmetic-a1914b.netlify.app"
+BOT_TOKEN = "8711059649:AAF7ysdDRw3rbWo9INoHvekeSCwy49QYhWE"
+MINI_APP_URL = "https://curious-kitsune-70d212.netlify.app"
 
 bot = TeleBot(BOT_TOKEN)
 logging.basicConfig(level=logging.INFO)
@@ -51,7 +52,6 @@ def send_welcome(message):
                 reply_markup=keyboard
             )
         except Exception as e:
-            # Если фото не найдено, отправляем без фото
             logging.error(f"Ошибка отправки фото: {e}")
             bot.send_message(
                 message.chat.id,
@@ -59,7 +59,6 @@ def send_welcome(message):
                 reply_markup=keyboard
             )
     else:
-        # Если фото не установлено, отправляем только текст
         bot.send_message(
             message.chat.id,
             "Привет! Нажми на кнопку ниже, чтобы открыть JAMPER SIGNAL:",
@@ -74,18 +73,15 @@ def get_current_file_id(message):
         return
     
     if IMAGE_FILE_ID:
+        # Убираем Markdown форматирование, отправляем обычным текстом
         bot.reply_to(
             message,
-            f"📸 *Текущий FILE_ID фото:*\n\n`{IMAGE_FILE_ID}`\n\n"
-            f"💡 Чтобы обновить фото, отправь новое фото в этот чат",
-            parse_mode="Markdown"
+            f"📸 Текущий FILE_ID фото:\n\n{IMAGE_FILE_ID}\n\n💡 Чтобы обновить фото, отправь новое фото в этот чат"
         )
     else:
         bot.reply_to(
             message,
-            "❌ Фото не установлено.\n"
-            "📤 Отправь фото в этот чат, чтобы установить его для приветствия",
-            parse_mode="Markdown"
+            "❌ Фото не установлено.\n📤 Отправь фото в этот чат, чтобы установить его для приветствия"
         )
 
 # Только админ может получать и обновлять file_id
@@ -104,21 +100,17 @@ def handle_photo(message):
     config['image_file_id'] = new_file_id
     save_config(config)
     
-    # Отправляем подтверждение
+    # Отправляем подтверждение (без Markdown)
     keyboard = InlineKeyboardMarkup()
     test_button = InlineKeyboardButton(
-        text="🔍 ТЕСТИРОВАТЬ (/start)",
+        text="🔍 ТЕСТИРОВАТЬ",
         callback_data="test_welcome"
     )
     keyboard.add(test_button)
     
     bot.reply_to(
         message,
-        f"✅ *Новое фото сохранено!*\n\n"
-        f"📸 FILE_ID:\n`{new_file_id}`\n\n"
-        f"👉 Используй /start для теста\n"
-        f"👉 Используй /getfileid чтобы посмотреть текущий ID",
-        parse_mode="Markdown",
+        f"✅ Новое фото сохранено!\n\n📸 FILE_ID:\n{new_file_id}\n\n👉 Используй /start для теста\n👉 Используй /getfileid чтобы посмотреть текущий ID",
         reply_markup=keyboard
     )
     
@@ -144,9 +136,8 @@ def test_welcome(call):
         bot.send_photo(
             call.message.chat.id,
             photo=IMAGE_FILE_ID,
-            caption="✅ *ТЕСТОВОЕ СООБЩЕНИЕ*\nПривет! Нажми на кнопку ниже:",
-            reply_markup=keyboard,
-            parse_mode="Markdown"
+            caption="✅ ТЕСТОВОЕ СООБЩЕНИЕ\nПривет! Нажми на кнопку ниже:",
+            reply_markup=keyboard
         )
     else:
         bot.send_message(
@@ -168,4 +159,5 @@ print("🤖 Команды для админа:")
 print("  📤 Отправь фото - обновить приветственное изображение")
 print("  /getfileid - показать текущий FILE_ID")
 print("  /start - тест приветствия")
+
 bot.infinity_polling()

@@ -2,7 +2,7 @@ import os
 import json
 import logging
 from telebot import TeleBot
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
 BOT_TOKEN = "8609032177:AAHWc7s7iMBu0LPpJboovAG18g6l0yYdg8I"
 MINI_APP_URL = "https://frolicking-arithmetic-a1914b.netlify.app"
@@ -33,13 +33,13 @@ IMAGE_FILE_ID = config.get('image_file_id', '')
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    # Создаем клавиатуру с кнопкой "НАЧАТЬ"
+    # Создаем клавиатуру с кнопкой "НАЧАТЬ" для WebApp
     keyboard = InlineKeyboardMarkup(row_width=1)
     
-    # Кнопка для открытия игры
+    # Кнопка для открытия мини-приложения (WebApp)
     game_button = InlineKeyboardButton(
-        text="🎮 НАЧАТЬ АНАЛИЗ",
-        url=MINI_APP_URL  # Открывается в браузере Telegram
+        text="🎮 НАЧАТЬ ИГРУ",
+        web_app=WebAppInfo(url=MINI_APP_URL)  # Открывается как мини-приложение
     )
     keyboard.add(game_button)
     
@@ -48,8 +48,8 @@ def send_welcome(message):
         f"👋 Привет, {message.from_user.first_name}!\n\n"
         "🎮 Добро пожаловать в **JAMPER SIGNAL**!\n\n"
         "🔥 Здесь тебя ждут:\n"
-        "• Анализы игры\n"
-        "• Крутые эмоции\n"
+        "• Увлекательные игры\n"
+        "• Крутые бонусы\n"
         "• Много веселья\n\n"
         "👇 Нажми на кнопку ниже, чтобы начать!"
     )
@@ -143,7 +143,7 @@ def test_welcome(call):
     keyboard = InlineKeyboardMarkup(row_width=1)
     game_button = InlineKeyboardButton(
         text="🎮 НАЧАТЬ ИГРУ",
-        url=MINI_APP_URL
+        web_app=WebAppInfo(url=MINI_APP_URL)  # WebApp кнопка
     )
     keyboard.add(game_button)
     
